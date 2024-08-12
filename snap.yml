@@ -1,14 +1,34 @@
 ---
+- name: Map hostnames to EC2 instance IDs
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Gather EC2 instance information based on tags or filters
+      amazon.aws.ec2_instance_info:
+        region: "{{ ec2_region }}"
+        filters:
+          "tag:Name": "{{ inventory_hostname }}"
+      register: ec2_info
+      delegate_to: localhost
+
+    - name: Set instance ID as a host fact
+      set_fact:
+        ec2_instance_id: "{{ ec2_info.instances[0].instance_id }}"
+
+    - name: Debug output for instance ID
+      debug:
+        msg: "Instance ID for {{ inventory_hostname }} is {{ ec2_instance_id }}"
+      delegate_to: localhost
+
+---
 - name: Create snapshots of EC2 instances
   hosts: all
   gather_facts: false
-  become: false
   tasks:
     - name: Gather EC2 instance information
       amazon.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
-        instance_ids: "{{ item }}"
-      loop: "{{ ansible_play_hosts }}"
+        instance_ids: "{{ ec2_instance_id }}"
       register: ec2_info
       delegate_to: localhost
 

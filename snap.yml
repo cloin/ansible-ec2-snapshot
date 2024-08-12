@@ -10,6 +10,8 @@
         instance_ids: "{{ item }}"
       loop: "{{ ansible_play_hosts }}"
       register: ec2_info
+      delegate_to: localhost
+
 
     - name: Create snapshots for each instance
       amazon.aws.ec2_snapshot:
@@ -20,7 +22,9 @@
       loop_control:
         loop_var: item
       register: snapshot_results
+      delegate_to: localhost
 
     - name: Output snapshot results
       debug:
         var: snapshot_results
+      delegate_to: localhost

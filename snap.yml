@@ -28,7 +28,7 @@
       amazon.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
         instance_ids: "{{ item }}"
-      loop: "{{ ansible_play_hosts }}"
+      loop: "{{ ec2_instance_id }}"
       register: ec2_info
       delegate_to: localhost
 

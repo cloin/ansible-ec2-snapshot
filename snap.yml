@@ -36,7 +36,7 @@
       amazon.aws.ec2_snapshot:
         region: "{{ ec2_region }}"
         instance_id: "{{ ec2_instance_id }}"
-        device_name: "{{ item.block_device_mappings[0].device_name }}"
+        device_name: "/dev/sda1"
         wait: true
       loop: "{{ ec2_info.results }}"
       loop_control:

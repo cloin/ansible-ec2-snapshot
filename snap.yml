@@ -27,7 +27,8 @@
     - name: Gather EC2 instance information
       amazon.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
-        instance_ids: "{{ ec2_instance_id }}"
+        instance_ids: "{{ item }}"
+      loop: "{{ ansible_play_hosts }}"
       register: ec2_info
       delegate_to: localhost
 
@@ -35,8 +36,9 @@
       amazon.aws.ec2_snapshot:
         region: "{{ ec2_region }}"
         instance_id: "{{ item.instance_id }}"
+        device_name: "{{ item.block_device_mappings[0].device_name }}"
         wait: true
-      loop: "{{ ec2_info.instances }}"
+      loop: "{{ ec2_info.results }}"
       loop_control:
         loop_var: item
       register: snapshot_results

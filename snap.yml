@@ -28,20 +28,23 @@
       amazon.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
         instance_ids: "{{ ec2_instance_id }}"
-      loop: "{{ ansible_play_hosts }}"
       register: ec2_info
       delegate_to: localhost
+      run_once: true
+
+    - name: Ensure unique instance IDs
+      set_fact:
+        unique_instances: "{{ ec2_info.results | map(attribute='instance_id') | unique }}"
 
     - name: Create snapshots for each instance
       amazon.aws.ec2_snapshot:
         region: "{{ ec2_region }}"
         instance_id: "{{ ec2_instance_id }}"
-        device_name: "/dev/sda1"
+        device_name: "{{ ec2_info.results | selectattr('instance_id', 'equalto', item) | map(attribute='root_device_name') | first }}"
         wait: true
-      loop: "{{ ec2_info.results }}"
+      loop: "{{ unique_instances }}"
       loop_control:
         loop_var: item
-      register: snapshot_results
       delegate_to: localhost
 
     - name: Output snapshot results

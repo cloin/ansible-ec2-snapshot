@@ -20,7 +20,6 @@
         msg: "Instance ID for {{ inventory_hostname }} is {{ ec2_instance_id }}"
       delegate_to: localhost
 
----
 - name: Create snapshots of EC2 instances
   hosts: all
   gather_facts: false

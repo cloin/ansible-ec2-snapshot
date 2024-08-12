@@ -2,7 +2,7 @@
 - name: Create snapshots of EC2 instances
   hosts: all
   gather_facts: false
-  become: true
+  become: false
   tasks:
     - name: Gather EC2 instance information
       amazon.aws.ec2_instance_info:

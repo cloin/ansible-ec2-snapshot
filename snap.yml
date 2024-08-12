@@ -1,0 +1,26 @@
+---
+- name: Create snapshots of EC2 instances
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Gather EC2 instance information
+      ec2_instance_info:
+        region: "{{ ec2_region }}"
+        instance_ids: "{{ item }}"
+      loop: "{{ ansible_play_hosts }}"
+      register: ec2_info
+
+    - name: Create snapshots for each instance
+      ec2_snapshot:
+        region: "{{ ec2_region }}"
+        instance_id: "{{ item.instance_id }}"
+        wait: true
+      loop: "{{ ec2_info.results }}"
+      loop_control:
+        loop_var: item
+      register: snapshot_results
+
+    - name: Output snapshot results
+      debug:
+        var: snapshot_results

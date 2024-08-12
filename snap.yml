@@ -34,13 +34,13 @@
 
     - name: Ensure unique instance IDs
       set_fact:
-        unique_instances: "{{ ec2_info.results | map(attribute='instance_id') | unique }}"
+        unique_instances: "{{ ec2_info.instances | map(attribute='instance_id') | unique }}"
 
     - name: Create snapshots for each instance
       amazon.aws.ec2_snapshot:
         region: "{{ ec2_region }}"
         instance_id: "{{ ec2_instance_id }}"
-        device_name: "{{ ec2_info.results | selectattr('instance_id', 'equalto', item) | map(attribute='root_device_name') | first }}"
+        device_name: "/dev/sda1"
         wait: true
       loop: "{{ unique_instances }}"
       loop_control:

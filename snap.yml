@@ -27,8 +27,8 @@
     - name: Gather EC2 instance information
       amazon.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
-        instance_ids: "{{ item }}"
-      loop: "{{ ec2_instance_id }}"
+        instance_ids: "{{ ec2_instance_id }}"
+      loop: "{{ ansible_play_hosts }}"
       register: ec2_info
       delegate_to: localhost
 

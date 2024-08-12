@@ -36,7 +36,7 @@
         region: "{{ ec2_region }}"
         instance_id: "{{ item.instance_id }}"
         wait: true
-      loop: "{{ ec2_info.results }}"
+      loop: "{{ ec2_info.instances }}"
       loop_control:
         loop_var: item
       register: snapshot_results

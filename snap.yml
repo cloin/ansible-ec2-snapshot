@@ -45,6 +45,7 @@
       loop: "{{ unique_instances }}"
       loop_control:
         loop_var: item
+      register: snapshot_results
       delegate_to: localhost
 
     - name: Output snapshot results

@@ -15,7 +15,8 @@
 
     - name: Store latest snapshot ID as hostvar
       ansible.builtin.set_stats:
-        latest_snapshot_id: "{{ snapshot_results.snapshot_id }}"
+        data:
+          latest_snapshot_id_{{ inventory_hostname }}: "{{ latest_snapshot_id }}"
 
     - name: Output snapshot results
       ansible.builtin.debug:

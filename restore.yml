@@ -35,7 +35,7 @@
       amazon.aws.ec2_vol:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         id: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"
-        instance: none
+        instance: None
       register: detach_volume
       delegate_to: localhost
 

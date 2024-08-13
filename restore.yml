@@ -26,7 +26,7 @@
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         instance_ids: "{{ hostvars[inventory_hostname]['instance_id'] }}"
       register: instance_info
-      until: instance_info.instances[0].state == "stopped"
+      until: instance_info.instances[0].state.name == "stopped"
       retries: 10
       delay: 30
       delegate_to: localhost
@@ -74,7 +74,7 @@
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         instance_ids: "{{ hostvars[inventory_hostname]['instance_id'] }}"
       register: instance_info
-      until: instance_info.instances[0].state == "running"
+      until: instance_info.instances[0].state.name == "running"
       retries: 10
       delay: 30
       delegate_to: localhost

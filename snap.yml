@@ -14,11 +14,15 @@
       delegate_to: localhost
 
     - name: Store latest snapshot ID as hostvar
+      ansible.builtin.set_fact:
+        latest_snapshot_id: "{{ snapshot_results.snapshot_id }}"
+
+    - name: Store latest snapshot ID in Controller job facts
       ansible.builtin.set_stats:
         data:
           latest_snapshot_id_{{ inventory_hostname }}: "{{ latest_snapshot_id }}"
 
     - name: Output snapshot results
-      ansible.builtin.debug:
+      debug:
         var: snapshot_results
       delegate_to: localhost

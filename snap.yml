@@ -1,29 +1,15 @@
 ---
-- name: Create snapshots of EC2 instances
+- name: Snapshot inventory hosts
   hosts: all
   gather_facts: false
   tasks:
-    # - name: Gather EC2 instance information
-    #   amazon.aws.ec2_instance_info:
-    #     region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
-    #     instance_ids: "{{ hostvars[inventory_hostname]['instance_id'] }}"
-    #   register: ec2_info
-    #   delegate_to: localhost
-    #   run_once: true
 
-    # - name: Ensure unique instance IDs
-    #   set_fact:
-    #     unique_instances: "{{ ec2_info.instances | map(attribute='instance_id') | unique }}"
-
-    - name: Create snapshots for each instance
+    - name: Create ec2 snapshots for each instance
       amazon.aws.ec2_snapshot:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         instance_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
         device_name: "{{ hostvars[inventory_hostname]['root_device_name'] }}"
         wait: true
-      # loop: "{{ unique_instances }}"
-      # loop_control:
-      #   loop_var: item
       register: snapshot_results
       delegate_to: localhost
 

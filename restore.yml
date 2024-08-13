@@ -35,29 +35,29 @@
       amazon.aws.ec2_vol:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         volume_id: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"
-        state: absent
+        instance: none
       register: detach_volume
       delegate_to: localhost
 
-    - name: Create a new volume from the latest snapshot
+    - name: Create and attach a new volume from the latest snapshot
       amazon.aws.ec2_vol:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         snapshot: "{{ snapshot_facts.snapshots[0].snapshot_id }}"
-        state: present
         volume_type: gp2
         size: "{{ snapshot_facts.snapshots[0].volume_size }}"
         availability_zone: "{{ hostvars[inventory_hostname]['placement']['availability_zone'] }}"
+        instance: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+        device_name: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['device_name'] }}"
       register: new_volume
       delegate_to: localhost
 
-    - name: Attach the new volume to the instance
-      amazon.aws.ec2_vol:
-        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
-        instance_id: "{{ instance_id }}"
-        volume_id: "{{ new_volume.volume_id }}"
-        device_name: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['device_name'] }}"
-        state: present
-      delegate_to: localhost
+    # - name: Attach the new volume to the instance
+    #   amazon.aws.ec2_vol:
+    #     region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
+    #     volume_id: "{{ new_volume.volume_id }}"
+    #     device_name: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['device_name'] }}"
+    #     instance: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+    #   delegate_to: localhost
 
     - name: Start the EC2 instance
       amazon.aws.ec2_instance:

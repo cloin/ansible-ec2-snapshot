@@ -35,7 +35,7 @@
       amazon.aws.ec2_vol:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         volume_id: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"
-        state: detached
+        state: absent
       register: detach_volume
       delegate_to: localhost
 
@@ -56,7 +56,7 @@
         instance_id: "{{ instance_id }}"
         volume_id: "{{ new_volume.volume_id }}"
         device_name: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['device_name'] }}"
-        state: attached
+        state: present
       delegate_to: localhost
 
     - name: Start the EC2 instance

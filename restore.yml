@@ -6,7 +6,7 @@
   tasks:
 
     - name: Find latest snapshot for each instance
-      amazon.aws.ec2_snapshot_facts:
+      amazon.aws.ec2_snapshot_info:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         filters:
           "volume-id": "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"

@@ -43,11 +43,12 @@
       amazon.aws.ec2_vol:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         snapshot: "{{ snapshot_facts.snapshots[0].snapshot_id }}"
-        volume_type: gp2
-        size: "{{ snapshot_facts.snapshots[0].volume_size }}"
-        availability_zone: "{{ hostvars[inventory_hostname]['placement']['availability_zone'] }}"
+        # volume_type: gp2
+        # size: "{{ snapshot_facts.snapshots[0].volume_size }}"
+        # availability_zone: "{{ hostvars[inventory_hostname]['placement']['availability_zone'] }}"
         instance: "{{ hostvars[inventory_hostname]['instance_id'] }}"
         device_name: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['device_name'] }}"
+        delete_on_termination: yes
       register: new_volume
       delegate_to: localhost
 

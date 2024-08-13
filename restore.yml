@@ -1,27 +1,28 @@
 ---
 - name: Restore the latest snapshot to EC2 instances
   hosts: all
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   tasks:
 
     - name: Find latest snapshot for each instance
       amazon.aws.ec2_snapshot_facts:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         filters:
-          "description": "Automated Snapshot"
+          "volume-id": "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"
       register: snapshot_facts
+      delegate_to: localhost
 
-    - name: Restore the latest snapshot to each instance
-      amazon.aws.ec2_vol:
-        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
-        instance_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
-        snapshot: "{{ hostvars[inventory_hostname]['latest_snapshot_id'] }}"
-        state: present
-        volume_type: gp2
-        device_name: "{{ hostvars[inventory_hostname]['root_device_name'] }}"
-      register: restore_results
+    # - name: Restore the latest snapshot to each instance
+    #   amazon.aws.ec2_vol:
+    #     region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
+    #     instance_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+    #     snapshot: "{{ hostvars[inventory_hostname]['latest_snapshot_id'] }}"
+    #     state: present
+    #     volume_type: gp2
+    #     device_name: "{{ hostvars[inventory_hostname]['root_device_name'] }}"
+    #   register: restore_results
 
-    - name: Output restore results
-      debug:
-        var: restore_results
+    # - name: Output restore results
+    #   debug:
+    #     var: restore_results

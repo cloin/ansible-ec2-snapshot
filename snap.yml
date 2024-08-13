@@ -13,10 +13,10 @@
       register: snapshot_results
       delegate_to: localhost
 
-    - name: Store latest snapshot ID
-      ansible.builtin.set_stats:
-        data:
-          latest_snapshot_id: "{{ snapshot_results.snapshot_id }}"
+    # - name: Store latest snapshot ID
+    #   ansible.builtin.set_stats:
+    #     data:
+    #       latest_snapshot_id: "{{ snapshot_results.snapshot_id }}"
 
     - name: Output snapshot results
       debug:

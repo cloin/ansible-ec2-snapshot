@@ -34,7 +34,7 @@
     - name: Detach the current volume from the instance
       amazon.aws.ec2_vol:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
-        volume_id: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"
+        id: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"
         instance: none
       register: detach_volume
       delegate_to: localhost

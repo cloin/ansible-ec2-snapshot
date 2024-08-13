@@ -32,12 +32,10 @@
       delegate_to: localhost
 
     - name: Detach the current volume from the instance
-      amazon.aws.ec2_instance:
+      amazon.aws.ec2_vol:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
-        instance_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
-        volumes:
-          - id: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"
-            state: absent
+        volume_id: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"
+        state: detached
       register: detach_volume
       delegate_to: localhost
 
@@ -53,13 +51,12 @@
       delegate_to: localhost
 
     - name: Attach the new volume to the instance
-      amazon.aws.ec2_instance:
+      amazon.aws.ec2_vol:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
-        instance_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
-        volumes:
-          - id: "{{ new_volume.volume_id }}"
-            device_name: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['device_name'] }}"
-            state: present
+        instance_id: "{{ instance_id }}"
+        volume_id: "{{ new_volume.volume_id }}"
+        device_name: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['device_name'] }}"
+        state: attached
       delegate_to: localhost
 
     - name: Start the EC2 instance

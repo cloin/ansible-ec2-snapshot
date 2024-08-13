@@ -4,31 +4,22 @@
   gather_facts: no
   become: yes
   tasks:
-    - name: Gather EC2 instance information
-      ec2_instance_info:
-        region: "{{ ec2_region }}"
-        instance_ids: "{{ item }}"
-      loop: "{{ ansible_play_hosts }}"
-      register: ec2_info
 
     - name: Find latest snapshot for each instance
-      ec2_snapshot_facts:
-        region: "{{ ec2_region }}"
+      amazon.aws.ec2_snapshot_facts:
+        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         filters:
           "description": "Automated Snapshot"
       register: snapshot_facts
 
     - name: Restore the latest snapshot to each instance
-      ec2_vol:
-        region: "{{ ec2_region }}"
-        instance_id: "{{ item.instance_id }}"
-        snapshot: "{{ snapshot_facts.snapshots | sort(attribute='start_time') | last }}"
+      amazon.aws.ec2_vol:
+        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
+        instance_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+        snapshot: "{{ hostvars[inventory_hostname]['latest_snapshot_id'] }}"
         state: present
         volume_type: gp2
-        device_name: /dev/sda1
-      loop: "{{ ec2_info.results }}"
-      loop_control:
-        loop_var: item
+        device_name: "{{ hostvars[inventory_hostname]['root_device_name'] }}"
       register: restore_results
 
     - name: Output restore results

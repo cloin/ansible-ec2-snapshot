@@ -5,12 +5,78 @@
   become: true
   tasks:
 
-    - name: Find latest snapshot for each instance
+    - name: Find available snapshots for each instance
       amazon.aws.ec2_snapshot_info:
         region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
         filters:
           "volume-id": "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"
       register: snapshot_facts
+      delegate_to: localhost
+
+    - name: Stop the EC2 instance
+      amazon.aws.ec2:
+        instance_ids: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+        state: stopped
+        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
+      register: stop_instance
+      delegate_to: localhost
+
+    - name: Wait for the instance to stop
+      amazon.aws.ec2_instance_info:
+        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
+        instance_ids: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+      register: instance_info
+      until: instance_info.instances[0].state == "stopped"
+      retries: 10
+      delay: 30
+      delegate_to: localhost
+
+    - name: Detach the current volume
+      amazon.aws.ec2_vol:
+        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
+        instance_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+        volume_id: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['ebs']['volume_id'] }}"
+        state: absent
+        device_name: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['device_name'] }}"
+      register: detach_volume
+      delegate_to: localhost
+
+    - name: Create a new volume from the latest snapshot
+      amazon.aws.ec2_vol:
+        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
+        snapshot: "{{ snapshot_facts.snapshots[0].snapshot_id }}"
+        state: present
+        volume_type: gp2
+        size: "{{ snapshot_facts.snapshots[0].volume_size }}"
+        availability_zone: "{{ hostvars[inventory_hostname]['placement']['availability_zone'] }}"
+      register: new_volume
+      delegate_to: localhost
+
+    - name: Attach the new volume to the instance
+      amazon.aws.ec2_vol:
+        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
+        instance_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+        volume_id: "{{ new_volume.volume_id }}"
+        device_name: "{{ hostvars[inventory_hostname]['block_device_mappings'][0]['device_name'] }}"
+        state: present
+      delegate_to: localhost
+
+    - name: Start the EC2 instance
+      amazon.aws.ec2:
+        instance_ids: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+        state: running
+        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
+      register: start_instance
+      delegate_to: localhost
+
+    - name: Wait for the instance to start
+      amazon.aws.ec2_instance_info:
+        region: "{{ hostvars[inventory_hostname]['placement']['region'] }}"
+        instance_ids: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+      register: instance_info
+      until: instance_info.instances[0].state == "running"
+      retries: 10
+      delay: 30
       delegate_to: localhost
 
     # - name: Restore the latest snapshot to each instance

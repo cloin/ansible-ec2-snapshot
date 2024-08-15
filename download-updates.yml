@@ -1,0 +1,14 @@
+---
+- name: Pre-download Windows updates
+  hosts: all
+  tasks:
+    - name: Pre-download updates without installing
+      ansible.windows.win_updates:
+        category_names:
+          - SecurityUpdates
+        download_only: yes
+      register: update_results
+
+    - name: Show which updates were downloaded
+      debug:
+        var: update_results

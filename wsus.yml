@@ -7,11 +7,11 @@
         path: HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate
         name: WUServer
         data: "{{ wsus_url }}"
-        type: REG_SZ
+        # type: REG_SZ
 
     - name: Set WSUS target group
       ansible.windows.win_regedit:
         path: HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
         name: TargetGroup
         data: "{{ wsus_target_group }}"
-        type: REG_SZ
+        # type: REG_SZ

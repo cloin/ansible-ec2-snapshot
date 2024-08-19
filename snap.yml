@@ -10,13 +10,13 @@
         instance_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
         device_name: "{{ hostvars[inventory_hostname]['root_device_name'] }}"
         wait: true
+        snapshot_tags:
+          Host: "{{ inventory_hostname }}"
+          InstanceId: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+          CreatedBy: "Ansible"
+          DeleteAfter: "August 2024"
       register: snapshot_results
       delegate_to: localhost
-
-    # - name: Store latest snapshot ID
-    #   ansible.builtin.set_stats:
-    #     data:
-    #       latest_snapshot_id: "{{ snapshot_results.snapshot_id }}"
 
     - name: Output snapshot results
       debug:
